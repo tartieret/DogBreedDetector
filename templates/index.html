@@ -1,44 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dog Breed Recognizer</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>Dog Breed Recognizer</title>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+
 </head>
 
 <body>
-   
+       
     <h1>Upload a new File</h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <ul class=flashes>
-            {% for category, message in messages %}
-                {% if category=='error' %}
-                <div class="alert alert-danger" role="alert">
-                    {{ message }}
-                </div>
-                {% else %}
-                <div class="alert alert-info" role="alert">
-                    {{ message }}
-                </div>
+    <div class="container">
+        <div class="col-md-6">
+
+            <form action="/" method="post" enctype="multipart/form-data" >
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class=flashes>
+                    {% for category, message in messages %}
+                        {% if category=='error' %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info" role="alert">
+                            {{ message }}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
                 {% endif %}
-            {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
-   
+            {% endwith %}
 
-    <form action="/" method="post" enctype="multipart/form-data" >
-        <label class="btn btn-default btn-file">
-            Browse <input <input type="file" name="file" style="display: none;">
-        </label>
-        <input type="submit" value="Upload your image" class="btn btn-primary">
-    </form>
+            {% if description %}
+                <div class="alert alert-success" role="alert">
+                        {{description}}
+                </div>
+            {% endif %}
 
-    <div class="text-center">
-        {{description}}
+            <div class="form-group">
+                <label>Upload Image</label>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <span class="btn btn-default btn-file">
+                            Browse… <input type="file" name="file" id="imgInp">
+                        </span>
+                    </span>
+                    <input type="text" class="form-control" readonly>
+                </div>
+                <img id='img-upload'/>
+            </div>
+
+            <input type="submit" value="Analyze" class="btn btn-primary">
+            </form>
+        </div>
     </div>
+   
+    <script type="text/javascript">
 
+    $(document).ready( function() {
+
+        /* Display the name of the selected file in the select box */
+    	$(document).on('change', '.btn-file :file', function() {
+            var input = $(this),
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            input.trigger('fileselect', [label]);
+		});
+
+		$('.btn-file :file').on('fileselect', function(event, label) {
+		    
+		    var input = $(this).parents('.input-group').find(':text'),
+		        log = label;
+		    
+		    if( input.length ) {
+		        input.val(log);
+		    } else {
+		        if( log ) alert(log);
+		    }
+	    
+		});
+		function readURL(input) {
+		    if (input.files && input.files[0]) {
+		        var reader = new FileReader();
+		        
+		        reader.onload = function (e) {
+		            $('#img-upload').attr('src', e.target.result);
+		        }
+		        
+		        reader.readAsDataURL(input.files[0]);
+		    }
+		}
+
+		$("#imgInp").change(function(){
+		    readURL(this);
+		}); 	
+	});
+
+    </script>
 </body>
 </html>

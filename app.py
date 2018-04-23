@@ -18,6 +18,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = os.environ.get(
     'SECRET_KEY', 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT')  
 
+# generate urls for static files
+
+
 # Check if input file is allowed
 def allowed_file(filename):
     return '.' in filename and \

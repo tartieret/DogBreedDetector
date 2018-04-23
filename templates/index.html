@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dog Breed Recognizer</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+</head>
+
+<body>
+   
+    <h1>Upload a new File</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class=flashes>
+            {% for category, message in messages %}
+                {% if category=='error' %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+                {% else %}
+                <div class="alert alert-info" role="alert">
+                    {{ message }}
+                </div>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+   
+
+    <form action="/" method="post" enctype="multipart/form-data" >
+        <label class="btn btn-default btn-file">
+            Browse <input <input type="file" name="file" style="display: none;">
+        </label>
+        <input type="submit" value="Upload your image" class="btn btn-primary">
+    </form>
+
+    <div class="text-center">
+        {{description}}
+    </div>
+
+</body>
+</html>

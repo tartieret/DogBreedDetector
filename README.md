@@ -10,7 +10,7 @@
 
 ### Deep Learning
 
-In this project, I built pipeline that can be used within a web or mobile app to process real-world, user-supplied images. Given an image of a dog, the algorithm will identify an estimate of the canine’s breed. If supplied an image of a human, the code will identify the resembling dog breed.
+In this project, I built a pipeline that can be used within a web or mobile app to process real-world, user-supplied images. Given an image of a dog, the algorithm will identify an estimate of the canine’s breed. If supplied an image of a human, the code will identify the resembling dog breed.
 
 In the first part of the project, I worked in a Jupyter notebook to perform the following steps:
 1. Use Haar feature-based cascade classifiers to detect human faces in images
@@ -19,7 +19,7 @@ In the first part of the project, I worked in a Jupyter notebook to perform the 
 4. Use Transfer Learning from VGG16 to identify dog breeds
 5. Use Transfer Learning from GoogLeNet to identify dog breeds
 
-My CNN architecture (step 3) reached a 35.76% accuracy on the test set, well above the minimum requirements for the project (1%). It was trained for 4 hours on a GPU. However, using transfer learning from the Inception/GoogLeNet was very successful with a final accuracy of 80.5%
+My own CNN architecture (step 3) reached a 35.76% accuracy on the test set, well above the minimum requirements for the project (1%). It was trained for 4 hours on a GPU. However, using transfer learning from the Inception/GoogLeNet was very successful with a final accuracy of 80.5%
 
 Check the Jupyter notebook ```dog_app.ipynb``` for more details.
 

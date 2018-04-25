@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -12,6 +11,9 @@
     <!-- Bootstrap core CSS -->
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 
+    <!-- Ladda -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/ladda-themeless.min.css" rel="stylesheet" id="ladda-css">
+    
     <!-- Custom styles for this template -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
 
@@ -22,34 +24,12 @@
     <!-- Begin page content -->
     <main role="main" class="container">
       <h1 class="mt-5">Dog Breed Classifier</h1>
-      <p class="lead">Use Transfer Learning to identify a dog breed!</p>
+      <p class="lead">Using Transfer Learning to identify a dog breed!</p>
       <p>Please upload a photo of a dog or human.</p>
 
-      <form action="/" method="post" enctype="multipart/form-data" >
+      <form id="upload-file" method="post" enctype="multipart/form-data" >
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul class=flashes>
-                {% for category, message in messages %}
-                    {% if category=='error' %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ message }}
-                    </div>
-                    {% else %}
-                    <div class="alert alert-info" role="alert">
-                        {{ message }}
-                    </div>
-                    {% endif %}
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-
-        {% if description %}
-            <div class="alert alert-success" role="alert">
-                    {{description}}
-            </div>
-        {% endif %}
+        <div id="messages"></div>
 
         <div class="form-group">
             <div class="input-group">
@@ -60,12 +40,14 @@
                 </span>
                 <input type="text" class="form-control" readonly>
             </div>
-            <img id='img-upload'/>
+            <img id='img-upload' src="{{src_file}}"/>
         </div>
 
-        <input type="submit" value="Analyze" class="btn btn-primary">
+        <button id="upload-file-btn" value="Analyze" class="btn btn-primary ladda-button" data-style="expand-left">
+            <span class="ladda-label">Analyze</span>
+        </button>
     </form>            
-    
+
     </main>
 
     <footer class="footer">
@@ -77,11 +59,39 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="  crossorigin="anonymous"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/spin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Ladda/1.0.6/ladda.min.js"></script>    
+    
     <script type="text/javascript">
 
+        /*========================= Message display ====================== */
+
+        function alert_box(message, type) {
+            var box = '<div class="alert alert-'+type;
+            box += ' alert-dismissible" role="alert">';
+            box += '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+            box += message;
+            box += '</div>';       
+            return box;
+        }
+
+        function display_result(message) {
+            var box = alert_box(message, "success");           
+            $('#messages').html(box);
+        }
+
+        function display_error(message) {
+            var box = alert_box(message, "danger");           
+            $('#messages').html(box);
+        }
+
+        /*========================= Manage image selection ====================== */
         $(document).ready( function() {
+
+            // Bind Ladda to the submission button
+            Ladda.bind('#upload-file-btn');
     
             /* Display the name of the selected file in the select box */
             $(document).on('change', '.btn-file :file', function() {
@@ -117,7 +127,54 @@
             $("#imgInp").change(function(){
                 readURL(this);
             }); 	
+
+            /*========================= Image submission ====================== */
+            $('#upload-file-btn').click(function(e) {
+                e.preventDefault();
+
+                // start spinning animation
+                console.log('Create Ladda')
+                var l = Ladda.create($('#upload-file-btn')[0]);
+	 	        l.start();
+
+                console.log('Sending AJAX request')
+                // select form data
+                var form_data = new FormData($('#upload-file')[0]);
+               
+                $.ajax({
+                    type: 'POST',
+                    url: '/analysis',
+                    data: form_data,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    async: false,
+                    success: function(data) {
+                        console.log('Success!');
+                        if(data.hasOwnProperty('description')) {
+                            // display the results
+                            display_result(data.description);
+                        } else {
+                            display_error("No description found");
+                        }                        
+                    },
+                    error: function(data) {
+                        console.log('Error!');                        
+                        display_error(data.responseJSON.message);
+                    },
+                    complete: function(XMLHttpRequest, type) {
+                        console.log('All done');
+                        // stop spinning animation
+                        Ladda.stopAll();
+                    }
+                });
+
+                return false;                
+            });
+
+
         });
+
     
     </script>    
 
